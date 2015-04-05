@@ -6,9 +6,11 @@ import pandas as pd
 import numpy as np
 from nltk import PorterStemmer
 import scipy
+from helpers import find_math_words
 
 
 def strip_text(text):
+    math_words = find_math_words(text)
 
     text = text.replace('<span class=\"math\">', 'code_word_begin')
     text = text.replace('</span>', 'code_word_end')
@@ -38,7 +40,7 @@ def strip_text(text):
 
     list_voc = re.split(r'[ ]+', text)
 
-    return list_voc
+    return list_voc + math_words
 
 
 if __name__ == '__main__':
@@ -49,7 +51,9 @@ if __name__ == '__main__':
     df_topics = pd.read_csv('topics.csv')
     topic_list = list(df_topics['Topic'])
 
-    X = np.zeros(shape=(1, len(vocs)))
+    courses = [x[0] for x in next(os.walk('.'))[1]]
+
+    X = np.zeros(shape=(1, len(vocs) + len(courses)))
     Y = np.zeros(shape=(1, len(topic_list)))
 
     fo_list = [x[0] for x in os.walk('../json_data')]
@@ -57,7 +61,7 @@ if __name__ == '__main__':
         Files = glob.glob(folder + '/*.json')
         for File in Files:
 
-            x_vec = np.zeros(shape=(1, len(vocs)))
+            x_vec = np.zeros(shape=(1, len(vocs) + len(courses)))
             y_vec = np.zeros(shape=(1, len(topic_list)))
 
             fd = open(File, 'r')
@@ -85,7 +89,12 @@ if __name__ == '__main__':
                 word = str(word)
                 voc = PorterStemmer().stem_word(word)
                 if word in vocs:
-                    x_vec[0][vocs.index(word)] = 1
+                    x_vec[0][vocs.index(word)] = x_vec[0][vocs.indes(word)] + 1
+            for course in courses:
+                course = str(course)
+                if data['course'] in course:
+                    x_vec[0][len(voc) + courses.index(course)] = 1
+
             if 1 in y_vec:
                 X = np.append(X, x_vec, 0)
                 Y = np.append(Y, y_vec, 0)

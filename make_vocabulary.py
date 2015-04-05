@@ -4,19 +4,22 @@ import json
 import re
 from nltk import PorterStemmer
 from nltk.corpus import stopwords
+from helpers import find_math_words
 
 
 def strip_text(text):
 
+    math_words = find_math_words(text)
+
     text = text.replace('<span class=\"math\">', 'code_word_begin')
     text = text.replace('</span>', 'code_word_end')
-    text = re.sub(
-        r'(?<=code_word_begin)(.*?)(?=code_word_end)', ' ', text, flags=re.DOTALL)
+    text = re.sub(r'(?<=code_word_begin)(.*?)(?=code_word_end)', ' ', text,
+                  flags=re.DOTALL)
 
     text = text.replace('<em>', 'code_word_begin')
     text = text.replace('</em>', 'code_word_end')
-    text = re.sub(
-        r'(?<=code_word_begin)(.*?)(?=code_word_end)', ' ', text, flags=re.DOTALL)
+    text = re.sub(r'(?<=code_word_begin)(.*?)(?=code_word_end)', ' ', text,
+                  flags=re.DOTALL)
 
     text.strip()
     text = text.lower()
@@ -34,7 +37,7 @@ def strip_text(text):
 
     list_voc = re.split(r'[ ]+', text)
 
-    return list_voc
+    return list_voc + math_words
 
 
 if __name__ == '__main__':

@@ -1,0 +1,7 @@
+.ipynb_checkpoints/*
+*.ipynb
+X_data.csv
+Y_data.csv
+classifier.bin
+topics.csv
+vocabulary.csv
